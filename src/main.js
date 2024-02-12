@@ -19,9 +19,9 @@ const screenWidth = GAME_WIDTH * GAME_SCALE;
 const screenHeight = GAME_HEIGHT * GAME_SCALE;
 
 // Found it was smoother to disable vsync
-r.SetConfigFlags(r.FLAG_VSYNC_HINT);
+// r.SetConfigFlags(r.FLAG_VSYNC_HINT);
 // r.SetConfigFlags(r.FLAG_WINDOW_UNDECORATED);
-r.SetTargetFPS(60);
+// r.SetTargetFPS(60);
 r.InitWindow(screenWidth, screenHeight, "falling sand");
 
 const visitorFontUrl = fileURLToPath(
@@ -60,31 +60,22 @@ const mouse = {
 const grid = new Grid(GAME_WIDTH, GAME_HEIGHT);
 
 const TARGET_FPS = 60;
-const STEP = 1000 / TARGET_FPS;
-const dt = STEP / 1000;
-let last = performance.now();
-let variableDt = 0;
+const STEP = 1 / TARGET_FPS;
 let deltaTimeAccumulator = 0;
 
 while (!r.WindowShouldClose()) {
 	r.SetWindowTitle(
-		`falling sand [FPS: ${r.GetFPS()}], [mouse: {x: ${mouse.position.x}, y: ${
-			mouse.position.y
-		}}]`
+		`falling sand [mouse: {x: ${mouse.position.x}, y: ${mouse.position.y}}]`
 	);
 
 	deltaTimeAccumulator += r.GetFrameTime();
-	variableDt = r.GetFrameTime();
 
-	// while (deltaTimeAccumulator >= STEP) {
-	// 	grid.update();
-	// 	mouse.update();
+	while (deltaTimeAccumulator >= STEP) {
+		grid.update();
+		mouse.update();
 
-	// 	deltaTimeAccumulator -= STEP;
-	// }
-
-	grid.update();
-	mouse.update();
+		deltaTimeAccumulator -= STEP;
+	}
 
 	// -------------------------------------------------------------------------
 	// Render to texture
@@ -111,6 +102,7 @@ while (!r.WindowShouldClose()) {
 	r.BeginDrawing();
 	r.ClearBackground(r.BLANK);
 
+	// Draw "sand" texture
 	r.DrawTexturePro(
 		renderTexture.texture,
 		{
@@ -133,6 +125,7 @@ while (!r.WindowShouldClose()) {
 		r.WHITE
 	);
 
+	// Draw "ui" texture
 	r.DrawTexturePro(
 		uiRenderTexture.texture,
 		{
@@ -155,6 +148,8 @@ while (!r.WindowShouldClose()) {
 		r.WHITE
 	);
 
+	r.DrawFPS(screenWidth - 120, 10);
+
 	r.EndDrawing();
 }
 
@@ -169,40 +164,3 @@ r.UnloadRenderTexture(uiRenderTexture);
 r.UnloadFont(visitorFont);
 
 r.CloseWindow();
-
-// function frame(hrt: DOMHighResTimeStamp) {
-// 	deltaTimeAccumulator += Math.min(1000, hrt - last);
-
-// 	while (deltaTimeAccumulator >= STEP) {
-// 		grid.update();
-// 		mouse.update();
-
-// 		deltaTimeAccumulator -= STEP;
-// 	}
-
-// 	grid.render(ctx);
-
-// 	uiCtx.clearRect(0, 0, uiCanvas.width, uiCanvas.height);
-
-// 	uiCtx.fillStyle = SAND_COLOR;
-// 	uiCtx.beginPath();
-// 	uiCtx.arc(
-// 		Math.floor(mouse.position.x),
-// 		Math.floor(mouse.position.y),
-// 		3,
-// 		0,
-// 		2 * Math.PI
-// 	);
-
-// 	uiCtx.fill();
-
-// 	uiCtx.fillStyle = "white";
-// 	uiCtx.font = "10px Visitor";
-
-// 	uiCtx.setTransform(IDENTITY_MATRIX);
-
-// 	canvasRecorder.frame();
-
-// 	last = hrt;
-// 	requestAnimationFrame(frame);
-// }
